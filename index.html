@@ -1,0 +1,1496 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bellevue Serve IA Prototype</title>
+    <style>
+      :root {
+        --border: #cfd9ec;
+        --text: #1f1f1f;
+        --muted: #5f6b7c;
+        --bg: #ffffff;
+        --panel: #f6faff;
+        --active: #e9f8ff;
+        --navy: #022975;
+        --sky: #54ceff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      .page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        font-size: 28px;
+        margin-bottom: 12px;
+        color: var(--navy);
+      }
+
+      h2 {
+        font-size: 20px;
+        margin-bottom: 12px;
+        color: var(--navy);
+      }
+
+      h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: var(--navy);
+      }
+
+      p,
+      li,
+      td,
+      th,
+      button,
+      select {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .section {
+        border: 1px solid var(--border);
+        padding: 16px;
+        margin-bottom: 16px;
+        background: #fff;
+        border-radius: 14px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 16px;
+      }
+
+      .categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .category-button {
+        border: 1px solid var(--border);
+        background: #fff;
+        padding: 8px 12px;
+        cursor: pointer;
+        color: var(--navy);
+        border-radius: 999px;
+      }
+
+      .category-button.active {
+        background: var(--sky);
+        border-color: var(--navy);
+        font-weight: 700;
+      }
+
+      .filter-group {
+        margin-bottom: 12px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 700;
+        color: var(--navy);
+      }
+
+      select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 10px;
+      }
+
+      .results-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .meta-pill {
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--navy);
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .opportunity-card {
+        border: 1px solid var(--border);
+        background: var(--panel);
+        border-radius: 14px;
+        padding: 14px;
+      }
+
+      .opportunity-card.selected {
+        background: #eef9ff;
+        border-color: var(--sky);
+      }
+
+      .result-button {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        text-align: left;
+        padding: 0;
+        cursor: pointer;
+        color: inherit;
+        font: inherit;
+      }
+
+      .result-button strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      .card-summary {
+        margin: 0 0 14px;
+        font-size: 15px;
+      }
+
+      .card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .card-pill {
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 10px;
+        padding: 6px 10px;
+      }
+
+      .card-pill-label {
+        color: var(--muted);
+        font-size: 12px;
+        margin-right: 4px;
+      }
+
+      .card-pill-value {
+        color: var(--navy);
+        font-weight: 700;
+      }
+
+      .card-action {
+        color: var(--navy);
+        font-weight: 700;
+      }
+
+      .detail-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) 320px;
+        gap: 18px;
+      }
+
+      .detail-main {
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fcff 100%);
+        border-radius: 16px;
+        padding: 22px;
+      }
+
+      .detail-kicker {
+        color: var(--navy);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 10px;
+      }
+
+      .detail-lead {
+        font-size: 18px;
+        line-height: 1.6;
+        max-width: 54ch;
+        margin-bottom: 18px;
+      }
+
+      .detail-highlights {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .highlight {
+        border: 1px solid var(--border);
+        padding: 14px;
+        background: var(--panel);
+        border-radius: 14px;
+      }
+
+      .highlight-label {
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+
+      .highlight-value {
+        color: var(--navy);
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.3;
+      }
+
+      .detail-block {
+        margin-top: 18px;
+      }
+
+      .detail-block h3 {
+        margin-bottom: 10px;
+      }
+
+      .detail-list {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .detail-list li + li {
+        margin-top: 8px;
+      }
+
+      .detail-side {
+        display: grid;
+        gap: 12px;
+        align-content: start;
+      }
+
+      .detail-box {
+        border: 1px solid var(--border);
+        padding: 16px;
+        background: var(--panel);
+        border-radius: 14px;
+      }
+
+      .detail-box strong {
+        display: block;
+        color: var(--navy);
+        margin-bottom: 10px;
+      }
+
+      .detail-box p,
+      .detail-box ul {
+        margin: 0;
+      }
+
+      .detail-box ul {
+        padding-left: 18px;
+      }
+
+      .detail-box li + li {
+        margin-top: 8px;
+      }
+
+      .detail-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .detail-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 16px;
+        border-radius: 999px;
+        border: 1px solid var(--navy);
+        color: var(--navy);
+        background: #fff;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .detail-button.primary {
+        background: var(--navy);
+        color: #fff;
+      }
+
+      @media (max-width: 900px) {
+        .row,
+        .detail-layout,
+        .detail-highlights {
+          grid-template-columns: 1fr;
+        }
+
+        .results-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page" id="top">
+      <section class="section">
+        <h1>Bellevue Serve Prototype</h1>
+        <div class="categories" id="category-nav"></div>
+      </section>
+
+      <section class="row">
+        <aside class="section">
+          <h2>Filters</h2>
+
+          <div class="filter-group">
+            <label for="audience-filter">Audience</label>
+            <select id="audience-filter">
+              <option value="all">All audiences</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="schedule-filter">Schedule</label>
+            <select id="schedule-filter">
+              <option value="all">All schedules</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="role-filter">Role Type</label>
+            <select id="role-filter">
+              <option value="all">All role types</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="commitment-filter">Commitment</label>
+            <select id="commitment-filter">
+              <option value="all">All commitments</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="requirements-filter">Requirements</label>
+            <select id="requirements-filter">
+              <option value="all">Any requirements</option>
+            </select>
+          </div>
+        </aside>
+
+        <div>
+          <section class="section">
+            <div class="results-summary">
+              <div>
+                <h2 id="results-title">Explore opportunities</h2>
+                <p class="muted" id="results-subtitle">Start with any role that sounds like a fit.</p>
+              </div>
+              <strong class="meta-pill" id="results-count">0 roles</strong>
+            </div>
+            <div class="results-grid" id="results-body"></div>
+          </section>
+
+          <section class="section">
+            <div class="detail-layout">
+              <div class="detail-main">
+                <div class="detail-kicker" id="detail-category">Welcome &amp; Hospitality</div>
+                <h2 id="detail-title">Door Greeter</h2>
+                <p class="muted detail-lead" id="detail-summary"></p>
+
+                <div class="detail-highlights">
+                  <div class="highlight">
+                    <div class="highlight-label">Best for</div>
+                    <div class="highlight-value" id="detail-best-for"></div>
+                  </div>
+                  <div class="highlight">
+                    <div class="highlight-label">Usually serves</div>
+                    <div class="highlight-value" id="detail-when"></div>
+                  </div>
+                  <div class="highlight">
+                    <div class="highlight-label">Great fit if you enjoy</div>
+                    <div class="highlight-value" id="detail-enjoy"></div>
+                  </div>
+                </div>
+
+                <div class="detail-block">
+                  <h3>What this role is like</h3>
+                  <ul class="detail-list" id="detail-fit-list"></ul>
+                </div>
+              </div>
+
+              <aside class="detail-side">
+                <div class="detail-box">
+                  <strong>What to expect</strong>
+                  <p id="detail-overview"></p>
+                </div>
+
+                <div class="detail-box">
+                  <strong>Before you start</strong>
+                  <ul id="detail-requirements"></ul>
+                </div>
+
+                <div class="detail-box">
+                  <strong>Next step</strong>
+                  <p id="detail-next-step"></p>
+                  <div class="detail-buttons" style="margin-top: 14px;">
+                    <a class="detail-button primary" href="#top">I'm interested</a>
+                    <a class="detail-button" href="#top">Ask a question</a>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const opportunities = [
+        {
+          title: "Adult Life Group Leader",
+          category: "Teaching & Discipleship",
+          audiences: ["Adults"],
+          schedule: "Sunday",
+          roleType: "Leadership",
+          commitment: "Ongoing",
+          requirements: ["Leader onboarding"],
+          summary: "Lead an adult group and help people grow in community and discipleship.",
+          rationale: "Adult group leadership belongs under the type of service, not under a ministry department.",
+          tags: ["Adults", "Leadership", "Sunday"]
+        },
+        {
+          title: "Adult Life Group Teacher",
+          category: "Teaching & Discipleship",
+          audiences: ["Adults"],
+          schedule: "Sunday",
+          roleType: "Teaching",
+          commitment: "Ongoing",
+          requirements: ["Leader onboarding"],
+          summary: "Teach adults in a Life Group setting with consistent preparation and presence.",
+          rationale: "This is a teaching role first, even if it lives inside Adult Groups internally.",
+          tags: ["Adults", "Teaching", "Sunday"]
+        },
+        {
+          title: "Marriage Mentor",
+          category: "Care & Support",
+          audiences: ["Adults"],
+          schedule: "Flexible",
+          roleType: "Care",
+          commitment: "Ongoing",
+          requirements: ["Leader approval"],
+          summary: "Walk alongside couples with encouragement, wisdom, and relational support.",
+          rationale: "Users experience this as care and mentoring more than as an org chart placement.",
+          tags: ["Adults", "Care", "Flexible"]
+        },
+        {
+          title: "Adult Groups Welcome Table Volunteer",
+          category: "Welcome & Hospitality",
+          audiences: ["Adults", "All Ages"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Help people connect into adult groups by answering questions and welcoming new faces.",
+          rationale: "It functions like guest connection, so it belongs in a guest-facing browse path.",
+          tags: ["Adults", "Front-Facing", "Sunday"]
+        },
+        {
+          title: "Coffee Hospitality Volunteer",
+          category: "Welcome & Hospitality",
+          audiences: ["Adults", "All Ages"],
+          schedule: "Sunday",
+          roleType: "Practical Help",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Prepare and serve coffee in a way that helps people feel at ease and welcomed.",
+          rationale: "This is hospitality support, not a separate ministry concept for the user.",
+          tags: ["All Ages", "Practical Help", "Sunday"]
+        },
+        {
+          title: "Adult Groups Administrative Volunteer",
+          category: "Operations & Logistics",
+          audiences: ["Adults"],
+          schedule: "Weekday",
+          roleType: "Behind the Scenes",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Support the ministry team with coordination, records, and practical administrative help.",
+          rationale: "The role is operational, even if it supports a discipleship ministry.",
+          tags: ["Adults", "Behind the Scenes", "Weekday"]
+        },
+        {
+          title: "Home Group Leader",
+          category: "Teaching & Discipleship",
+          audiences: ["Adults"],
+          schedule: "Flexible",
+          roleType: "Leadership",
+          commitment: "Ongoing",
+          requirements: ["Leader onboarding"],
+          summary: "Lead a home-based group and help people build community outside the main campus rhythm.",
+          rationale: "Home groups fit the same primary service type as other discipleship roles.",
+          tags: ["Adults", "Leadership", "Flexible"]
+        },
+        {
+          title: "ESL Teacher",
+          category: "Teaching & Discipleship",
+          audiences: ["Adults", "Women"],
+          schedule: "Weekday",
+          roleType: "Teaching",
+          commitment: "Ongoing",
+          requirements: ["Leader approval"],
+          summary: "Teach English in a relational setting that supports learning, connection, and care.",
+          rationale: "Teaching is the most understandable browse pattern here; audience becomes a filter.",
+          tags: ["Adults", "Women", "Teaching"]
+        },
+        {
+          title: "Care Group Helper",
+          category: "Care & Support",
+          audiences: ["Adults"],
+          schedule: "Flexible",
+          roleType: "Care",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Support a care-focused group with presence, encouragement, and practical help.",
+          rationale: "A care role should be discoverable with other support-oriented opportunities.",
+          tags: ["Adults", "Care", "Flexible"]
+        },
+        {
+          title: "Bookstore Volunteer",
+          category: "Operations & Logistics",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Help people find resources and keep the bookstore running smoothly.",
+          rationale: "This is a practical support role, even though it has some guest interaction.",
+          tags: ["All Ages", "Front-Facing", "Sunday"]
+        },
+        {
+          title: "Campus Security Volunteer",
+          category: "Operations & Logistics",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Practical Help",
+          commitment: "Ongoing",
+          requirements: ["Background Check"],
+          summary: "Help create a safe environment on campus through presence, awareness, and support.",
+          rationale: "Users looking for practical operations roles should be able to find safety roles easily.",
+          tags: ["All Ages", "Practical Help", "Background Check"]
+        },
+        {
+          title: "Kids Check-In Assistant",
+          category: "Welcome & Hospitality",
+          audiences: ["Preschool", "Kids"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["CSA"],
+          summary: "Welcome families at check-in and help children get to the right environment smoothly.",
+          rationale: "The role feels like guest-facing support, with kids as the audience filter.",
+          tags: ["Kids", "Preschool", "CSA"]
+        },
+        {
+          title: "Wednesday Kids Worship Volunteer",
+          category: "Teaching & Discipleship",
+          audiences: ["Kids"],
+          schedule: "Wednesday",
+          roleType: "Teaching",
+          commitment: "Ongoing",
+          requirements: ["CSA"],
+          summary: "Lead and support kids during Wednesday worship and age-appropriate discipleship moments.",
+          rationale: "Cross-listed roles become easier to understand when they sit in one primary category.",
+          tags: ["Kids", "Wednesday", "Teaching"]
+        },
+        {
+          title: "Kids Worship Table Leader",
+          category: "Teaching & Discipleship",
+          audiences: ["Kids"],
+          schedule: "Sunday",
+          roleType: "Teaching",
+          commitment: "Ongoing",
+          requirements: ["CSA"],
+          summary: "Guide children at a worship table environment with energy, clarity, and care.",
+          rationale: "Plain-language titles reduce insider jargon while keeping the same underlying role.",
+          tags: ["Kids", "Teaching", "Sunday"]
+        },
+        {
+          title: "Preschool Life Group Teacher/Helper",
+          category: "Teaching & Discipleship",
+          audiences: ["Preschool"],
+          schedule: "Sunday",
+          roleType: "Teaching",
+          commitment: "Ongoing",
+          requirements: ["CSA"],
+          summary: "Teach or help in a preschool group with age-appropriate care and spiritual formation.",
+          rationale: "Age-specific teaching roles still belong in one consistent teaching bucket.",
+          tags: ["Preschool", "Teaching", "CSA"]
+        },
+        {
+          title: "Elementary Life Group Teacher/Helper",
+          category: "Teaching & Discipleship",
+          audiences: ["Kids"],
+          schedule: "Sunday",
+          roleType: "Teaching",
+          commitment: "Ongoing",
+          requirements: ["CSA"],
+          summary: "Teach or support elementary-aged kids in a Life Group environment.",
+          rationale: "This role should sit alongside other teaching roles and be refined by audience.",
+          tags: ["Kids", "Teaching", "Sunday"]
+        },
+        {
+          title: "Preschool Worship Care Volunteer",
+          category: "Care & Support",
+          audiences: ["Preschool"],
+          schedule: "Sunday",
+          roleType: "Care",
+          commitment: "Ongoing",
+          requirements: ["CSA"],
+          summary: "Care for preschool children during worship hours in a safe and nurturing setting.",
+          rationale: "The work is primarily care-oriented, not teaching-oriented.",
+          tags: ["Preschool", "Care", "CSA"]
+        },
+        {
+          title: "Kids Worship Helper",
+          category: "Teaching & Discipleship",
+          audiences: ["Kids"],
+          schedule: "Sunday",
+          roleType: "Teaching",
+          commitment: "Ongoing",
+          requirements: ["CSA"],
+          summary: "Support kids worship environments in a hands-on helper role.",
+          rationale: "Renaming the role makes it easy to understand at a glance.",
+          tags: ["Kids", "Teaching", "Sunday"]
+        },
+        {
+          title: "Kids Midweek Volunteer",
+          category: "Teaching & Discipleship",
+          audiences: ["Kids"],
+          schedule: "Wednesday",
+          roleType: "Teaching",
+          commitment: "Ongoing",
+          requirements: ["CSA"],
+          summary: "Help lead and support kids during a midweek discipleship environment.",
+          rationale: "The old acronym obscures what the role actually is.",
+          tags: ["Kids", "Wednesday", "Teaching"]
+        },
+        {
+          title: "Guest Check-In / Connect Central",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Help guests and members get answers, directions, and a clear next step.",
+          rationale: "Leading with the function makes the Bellevue name easier to understand.",
+          tags: ["All Ages", "Front-Facing", "Sunday"]
+        },
+        {
+          title: "Door Greeter",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Welcome people at entrances and help them feel comfortable from the start.",
+          rationale: "This is the clearest example of why a hospitality bucket works well.",
+          tags: ["All Ages", "Front-Facing", "Sunday"]
+        },
+        {
+          title: "Guest Parking Team",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Practical Help",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Guide vehicles and help guests arrive smoothly and confidently.",
+          rationale: "Still guest-facing, even though it happens outside and feels practical.",
+          tags: ["All Ages", "Practical Help", "Sunday"]
+        },
+        {
+          title: "Traffic Team",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Practical Help",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Support traffic flow so arrivals and departures feel organized and calm.",
+          rationale: "It contributes directly to the guest welcome experience.",
+          tags: ["All Ages", "Practical Help", "Sunday"]
+        },
+        {
+          title: "Valet Team",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["Driver Approval"],
+          summary: "Serve guests through valet assistance and practical hospitality at arrival.",
+          rationale: "Users understand this as hospitality and support, not as a separate ministry silo.",
+          tags: ["All Ages", "Front-Facing", "Driver Approval"]
+        },
+        {
+          title: "Welcome Center Volunteer",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Answer questions and help people understand where to go next.",
+          rationale: "It belongs with other first-impression roles.",
+          tags: ["All Ages", "Front-Facing", "Sunday"]
+        },
+        {
+          title: "Worship Center Greeter",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Welcome people into the worship space and help them get settled.",
+          rationale: "This role matches the same mental model as other greeter roles.",
+          tags: ["All Ages", "Front-Facing", "Sunday"]
+        },
+        {
+          title: "Baptism Volunteer",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Seasonal",
+          roleType: "Care",
+          commitment: "Seasonal",
+          requirements: ["Orientation"],
+          summary: "Support baptism services in ways that help participants and families feel cared for.",
+          rationale: "Users can find it through guest support rather than through event-specific knowledge.",
+          tags: ["All Ages", "Care", "Seasonal"]
+        },
+        {
+          title: "Homebound Care Volunteer",
+          category: "Care & Support",
+          audiences: ["Adults", "Seniors"],
+          schedule: "Flexible",
+          roleType: "Care",
+          commitment: "Ongoing",
+          requirements: ["Background Check"],
+          summary: "Care for homebound individuals through visits, connection, and encouragement.",
+          rationale: "This belongs with other relational support roles, with seniors as an audience filter.",
+          tags: ["Seniors", "Care", "Flexible"]
+        },
+        {
+          title: "Information Center Volunteer",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Provide information, wayfinding, and a calm point of contact for guests.",
+          rationale: "Another role that gets easier to find when all guest-help roles live together.",
+          tags: ["All Ages", "Front-Facing", "Sunday"]
+        },
+        {
+          title: "Hospitality Team",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Practical Help",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Support the overall hospitality environment through setup, service, and guest care.",
+          rationale: "Keeps the front-end browse path simple and coherent.",
+          tags: ["All Ages", "Practical Help", "Sunday"]
+        },
+        {
+          title: "Cafe Volunteer",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Practical Help",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Serve in the cafe and help create a warm, welcoming environment.",
+          rationale: "This is hospitality work more than a separate navigation concept.",
+          tags: ["All Ages", "Practical Help", "Sunday"]
+        },
+        {
+          title: "Culinary Support Volunteer",
+          category: "Operations & Logistics",
+          audiences: ["Adults", "All Ages"],
+          schedule: "Weekday",
+          roleType: "Behind the Scenes",
+          commitment: "Flexible",
+          requirements: ["Orientation"],
+          summary: "Help prepare and support food-related ministry operations behind the scenes.",
+          rationale: "The practical nature of the role fits operations better than front-end hospitality.",
+          tags: ["Adults", "Behind the Scenes", "Weekday"]
+        },
+        {
+          title: "Audio Assistant",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Creative",
+          commitment: "Ongoing",
+          requirements: ["Training Provided"],
+          summary: "Support audio production for worship services as an entry-level production role.",
+          rationale: "Media and music roles feel like one worship and production environment to most users.",
+          tags: ["All Ages", "Creative", "Training Provided"]
+        },
+        {
+          title: "Audio Production Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Creative",
+          commitment: "Ongoing",
+          requirements: ["Training Provided"],
+          summary: "Run audio elements that help worship services sound clear and well supported.",
+          rationale: "Groups technical worship roles into one obvious browse path.",
+          tags: ["All Ages", "Creative", "Sunday"]
+        },
+        {
+          title: "Camera Operator",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Creative",
+          commitment: "Ongoing",
+          requirements: ["Training Provided"],
+          summary: "Operate cameras to support live worship, online viewing, and visual storytelling.",
+          rationale: "Technical production belongs with other worship support roles.",
+          tags: ["All Ages", "Creative", "Training Provided"]
+        },
+        {
+          title: "Graphics Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Flexible",
+          roleType: "Creative",
+          commitment: "Flexible",
+          requirements: ["Portfolio Review"],
+          summary: "Create or support graphics that help communicate clearly in worship and ministry settings.",
+          rationale: "Creative work should be discoverable alongside music and production roles.",
+          tags: ["All Ages", "Creative", "Flexible"]
+        },
+        {
+          title: "Lighting Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Creative",
+          commitment: "Ongoing",
+          requirements: ["Training Provided"],
+          summary: "Support lighting cues and stage environment for worship gatherings.",
+          rationale: "Users think of this as part of the same worship-production ecosystem.",
+          tags: ["All Ages", "Creative", "Sunday"]
+        },
+        {
+          title: "Major Event Setup Team",
+          category: "Operations & Logistics",
+          audiences: ["All Ages"],
+          schedule: "Seasonal",
+          roleType: "Practical Help",
+          commitment: "Seasonal",
+          requirements: ["Orientation"],
+          summary: "Help set up spaces and practical elements for major events and special gatherings.",
+          rationale: "This can still be tagged to worship and events, but operations is the clearest primary home.",
+          tags: ["All Ages", "Practical Help", "Seasonal"]
+        },
+        {
+          title: "Online Response Team",
+          category: "Welcome & Hospitality",
+          audiences: ["All Ages"],
+          schedule: "Flexible",
+          roleType: "Front-Facing",
+          commitment: "Flexible",
+          requirements: ["Training Provided"],
+          summary: "Respond to people online with warmth, clarity, and a helpful next step.",
+          rationale: "Digital hospitality should sit with other connection roles, not be buried in media.",
+          tags: ["All Ages", "Front-Facing", "Flexible"]
+        },
+        {
+          title: "Photo / Video Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Creative",
+          commitment: "Flexible",
+          requirements: ["Portfolio Review"],
+          summary: "Capture photo and video content that supports worship and church storytelling.",
+          rationale: "Keeps visual storytelling roles together in a clear creative category.",
+          tags: ["All Ages", "Creative", "Sunday"]
+        },
+        {
+          title: "Prompter",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Behind the Scenes",
+          commitment: "Ongoing",
+          requirements: ["Training Provided"],
+          summary: "Run prompter support during services to help the platform flow smoothly.",
+          rationale: "Specific production roles become easier to compare in one category.",
+          tags: ["All Ages", "Behind the Scenes", "Sunday"]
+        },
+        {
+          title: "Set Construction Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Weekday",
+          roleType: "Practical Help",
+          commitment: "Seasonal",
+          requirements: ["Orientation"],
+          summary: "Help build sets and scenic pieces for productions and special events.",
+          rationale: "This is still part of worship production even though it is practical and physical.",
+          tags: ["All Ages", "Practical Help", "Seasonal"]
+        },
+        {
+          title: "Set Painting Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Weekday",
+          roleType: "Creative",
+          commitment: "Seasonal",
+          requirements: ["Orientation"],
+          summary: "Paint scenic pieces and support production environments through visual finishing work.",
+          rationale: "It is easier to discover when grouped with other creative production work.",
+          tags: ["All Ages", "Creative", "Seasonal"]
+        },
+        {
+          title: "Social Media Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Flexible",
+          roleType: "Creative",
+          commitment: "Flexible",
+          requirements: ["Portfolio Review"],
+          summary: "Support Bellevue's digital storytelling and communication through social media content.",
+          rationale: "A creative communications role belongs with other content and production opportunities.",
+          tags: ["All Ages", "Creative", "Flexible"]
+        },
+        {
+          title: "Choir Member",
+          category: "Worship & Production",
+          audiences: ["Adults"],
+          schedule: "Weekday",
+          roleType: "Creative",
+          commitment: "Ongoing",
+          requirements: ["Audition"],
+          summary: "Serve in worship through choir participation and rehearsal-based commitment.",
+          rationale: "Music roles are easier to browse when they live with other worship support roles.",
+          tags: ["Adults", "Creative", "Audition"]
+        },
+        {
+          title: "Orchestra Member",
+          category: "Worship & Production",
+          audiences: ["Students", "Adults"],
+          schedule: "Weekday",
+          roleType: "Creative",
+          commitment: "Ongoing",
+          requirements: ["Audition"],
+          summary: "Serve musically in worship gatherings as part of the orchestra.",
+          rationale: "Audience varies, but the service type stays the same.",
+          tags: ["Students", "Adults", "Audition"]
+        },
+        {
+          title: "Contemporary Worship Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Sunday",
+          roleType: "Creative",
+          commitment: "Ongoing",
+          requirements: ["Audition"],
+          summary: "Serve in contemporary worship environments through musical and platform support.",
+          rationale: "Keeps modern worship roles easy to find without splitting the music ecosystem.",
+          tags: ["All Ages", "Creative", "Audition"]
+        },
+        {
+          title: "Costuming / Makeup Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Seasonal",
+          roleType: "Creative",
+          commitment: "Seasonal",
+          requirements: ["Orientation"],
+          summary: "Support productions with costuming, makeup, and visual preparation.",
+          rationale: "Production support should stay bundled together even when not platform-facing.",
+          tags: ["All Ages", "Creative", "Seasonal"]
+        },
+        {
+          title: "Sets and Props Volunteer",
+          category: "Worship & Production",
+          audiences: ["All Ages"],
+          schedule: "Seasonal",
+          roleType: "Practical Help",
+          commitment: "Seasonal",
+          requirements: ["Orientation"],
+          summary: "Support productions through sets, props, and practical creative prep.",
+          rationale: "Another role that gets more understandable when it sits inside a creative production bucket.",
+          tags: ["All Ages", "Practical Help", "Seasonal"]
+        },
+        {
+          title: "Student Choir Member",
+          category: "Worship & Production",
+          audiences: ["Students", "Young Adults"],
+          schedule: "Weekday",
+          roleType: "Creative",
+          commitment: "Ongoing",
+          requirements: ["Audition"],
+          summary: "Serve in worship through choir participation designed for student-aged singers.",
+          rationale: "Youth-specific music roles still fit the same primary category with audience filters.",
+          tags: ["Students", "Young Adults", "Audition"]
+        },
+        {
+          title: "Student Life Group Hour Leader",
+          category: "Teaching & Discipleship",
+          audiences: ["Students"],
+          schedule: "Sunday",
+          roleType: "Leadership",
+          commitment: "Ongoing",
+          requirements: ["Background Check"],
+          summary: "Lead a student group hour with relational investment and spiritual guidance.",
+          rationale: "Students become the audience filter while leadership stays the primary role type.",
+          tags: ["Students", "Leadership", "Sunday"]
+        },
+        {
+          title: "Student Life Group Leader",
+          category: "Teaching & Discipleship",
+          audiences: ["Students"],
+          schedule: "Sunday",
+          roleType: "Leadership",
+          commitment: "Ongoing",
+          requirements: ["Background Check"],
+          summary: "Lead students in a Life Group setting with consistency and discipleship focus.",
+          rationale: "This should be easy to find alongside other group leadership roles.",
+          tags: ["Students", "Leadership", "Sunday"]
+        },
+        {
+          title: "Wednesday Night Student Volunteer",
+          category: "Teaching & Discipleship",
+          audiences: ["Students"],
+          schedule: "Wednesday",
+          roleType: "Care",
+          commitment: "Ongoing",
+          requirements: ["Background Check"],
+          summary: "Support student ministry on Wednesday nights through presence, help, and connection.",
+          rationale: "The role serves students, but the top-level structure stays function-based.",
+          tags: ["Students", "Care", "Wednesday"]
+        },
+        {
+          title: "Prayer Team Member",
+          category: "Care & Support",
+          audiences: ["All Ages"],
+          schedule: "Flexible",
+          roleType: "Care",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Pray with and for people in a role centered on encouragement and spiritual support.",
+          rationale: "Prayer belongs with care-oriented roles in the user mental model.",
+          tags: ["All Ages", "Care", "Flexible"]
+        },
+        {
+          title: "Youth Sports Assistant Coach",
+          category: "Sports & Recreation",
+          audiences: ["Kids", "Students"],
+          schedule: "Seasonal",
+          roleType: "Leadership",
+          commitment: "Seasonal",
+          requirements: ["Background Check"],
+          summary: "Support youth teams through coaching, encouragement, and consistent presence.",
+          rationale: "Sports is a clear functional category, with kids and students as audience filters.",
+          tags: ["Kids", "Students", "Seasonal"]
+        },
+        {
+          title: "Adult Sports Connector",
+          category: "Sports & Recreation",
+          audiences: ["Adults"],
+          schedule: "Weekday",
+          roleType: "Front-Facing",
+          commitment: "Seasonal",
+          requirements: ["Orientation"],
+          summary: "Help adults connect into sports-based community and participation opportunities.",
+          rationale: "This is still a sports role first, even though it is relational.",
+          tags: ["Adults", "Front-Facing", "Seasonal"]
+        },
+        {
+          title: "Youth Sports Head Coach",
+          category: "Sports & Recreation",
+          audiences: ["Kids", "Students"],
+          schedule: "Seasonal",
+          roleType: "Leadership",
+          commitment: "Seasonal",
+          requirements: ["Background Check"],
+          summary: "Lead youth teams in a way that builds skill, character, and community.",
+          rationale: "The category stays stable while audience and season narrow the result set.",
+          tags: ["Kids", "Students", "Leadership"]
+        },
+        {
+          title: "Car Care Volunteer",
+          category: "Care & Support",
+          audiences: ["Adults"],
+          schedule: "Weekday",
+          roleType: "Practical Help",
+          commitment: "Flexible",
+          requirements: ["Skill Review"],
+          summary: "Serve through practical car care for people who need support and assistance.",
+          rationale: "This is a care role expressed through practical help.",
+          tags: ["Adults", "Practical Help", "Weekday"]
+        },
+        {
+          title: "Transportation Driver",
+          category: "Operations & Logistics",
+          audiences: ["Adults"],
+          schedule: "Flexible",
+          roleType: "Practical Help",
+          commitment: "Flexible",
+          requirements: ["Driver Approval"],
+          summary: "Drive for ministry needs locally or on longer routes as approved.",
+          rationale: "Driving is operational support and should be easy to find with other logistics roles.",
+          tags: ["Adults", "Practical Help", "Driver Approval"]
+        },
+        {
+          title: "Bellevue Woods Transportation Volunteer",
+          category: "Care & Support",
+          audiences: ["Seniors"],
+          schedule: "Flexible",
+          roleType: "Practical Help",
+          commitment: "Ongoing",
+          requirements: ["Driver Approval"],
+          summary: "Provide off-campus transportation support for Bellevue Woods residents.",
+          rationale: "The purpose is care for seniors, even though transportation is the method.",
+          tags: ["Seniors", "Practical Help", "Driver Approval"]
+        },
+        {
+          title: "Young Adults Disciple-Making Group Leader",
+          category: "Teaching & Discipleship",
+          audiences: ["Young Adults"],
+          schedule: "Flexible",
+          roleType: "Leadership",
+          commitment: "Ongoing",
+          requirements: ["Leader onboarding"],
+          summary: "Lead young adults in a disciple-making group with consistency and relational depth.",
+          rationale: "Young adults stays visible as an audience without becoming an inconsistent top-level bucket.",
+          tags: ["Young Adults", "Leadership", "Flexible"]
+        },
+        {
+          title: "Young Adults Greeter",
+          category: "Welcome & Hospitality",
+          audiences: ["Young Adults"],
+          schedule: "Sunday",
+          roleType: "Front-Facing",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Welcome young adults and help them feel known and included from the start.",
+          rationale: "Audience-specific hospitality roles can still use the same category system.",
+          tags: ["Young Adults", "Front-Facing", "Sunday"]
+        },
+        {
+          title: "Young Adults Life Group Leader",
+          category: "Teaching & Discipleship",
+          audiences: ["Young Adults"],
+          schedule: "Sunday",
+          roleType: "Leadership",
+          commitment: "Ongoing",
+          requirements: ["Leader onboarding"],
+          summary: "Lead a Life Group for young adults and help create a space for growth and community.",
+          rationale: "This follows the same pattern as adult and student group leadership roles.",
+          tags: ["Young Adults", "Leadership", "Sunday"]
+        },
+        {
+          title: "Young Adults Outreach Volunteer",
+          category: "Care & Support",
+          audiences: ["Young Adults"],
+          schedule: "Flexible",
+          roleType: "Care",
+          commitment: "Flexible",
+          requirements: ["Orientation"],
+          summary: "Help young adults connect outwardly through relational outreach and encouragement.",
+          rationale: "This reads as relational support and outreach, not as a separate category system.",
+          tags: ["Young Adults", "Care", "Flexible"]
+        },
+        {
+          title: "Young Adults Prayer Volunteer",
+          category: "Care & Support",
+          audiences: ["Young Adults"],
+          schedule: "Flexible",
+          roleType: "Care",
+          commitment: "Ongoing",
+          requirements: ["Orientation"],
+          summary: "Support the young adults ministry through prayer and spiritual encouragement.",
+          rationale: "Keeps prayer and care roles together while preserving the target audience.",
+          tags: ["Young Adults", "Care", "Flexible"]
+        }
+      ];
+
+      const categories = [
+        "All Categories",
+        "Welcome & Hospitality",
+        "Teaching & Discipleship",
+        "Care & Support",
+        "Worship & Production",
+        "Operations & Logistics",
+        "Sports & Recreation"
+      ];
+
+      const state = {
+        category: "All Categories",
+        audience: "all",
+        schedule: "all",
+        roleType: "all",
+        commitment: "all",
+        requirements: "all",
+        selectedTitle: "Door Greeter"
+      };
+
+      const categoryNavEl = document.getElementById("category-nav");
+      const resultsBodyEl = document.getElementById("results-body");
+      const resultsTitleEl = document.getElementById("results-title");
+      const resultsSubtitleEl = document.getElementById("results-subtitle");
+      const resultsCountEl = document.getElementById("results-count");
+
+      const filters = {
+        audience: document.getElementById("audience-filter"),
+        schedule: document.getElementById("schedule-filter"),
+        roleType: document.getElementById("role-filter"),
+        commitment: document.getElementById("commitment-filter"),
+        requirements: document.getElementById("requirements-filter")
+      };
+
+      function uniqueValues(key, nested = false) {
+        const values = opportunities.flatMap((item) => (nested ? item[key] : [item[key]]));
+        return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+      }
+
+      function populateSelect(select, values) {
+        values.forEach((value) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+      }
+
+      populateSelect(filters.audience, uniqueValues("audiences", true));
+      populateSelect(filters.schedule, uniqueValues("schedule"));
+      populateSelect(filters.roleType, uniqueValues("roleType"));
+      populateSelect(filters.commitment, uniqueValues("commitment"));
+      populateSelect(filters.requirements, uniqueValues("requirements", true));
+
+      categories.forEach((category) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `category-button${category === state.category ? " active" : ""}`;
+        button.textContent = category;
+        button.addEventListener("click", () => {
+          state.category = category;
+          render();
+        });
+        categoryNavEl.appendChild(button);
+      });
+
+      Object.entries(filters).forEach(([key, select]) => {
+        select.addEventListener("change", (event) => {
+          state[key] = event.target.value;
+          render();
+        });
+      });
+
+      function filteredOpportunities() {
+        return opportunities.filter((item) => {
+          const categoryMatch = state.category === "All Categories" || item.category === state.category;
+          const audienceMatch = state.audience === "all" || item.audiences.includes(state.audience);
+          const scheduleMatch = state.schedule === "all" || item.schedule === state.schedule;
+          const roleTypeMatch = state.roleType === "all" || item.roleType === state.roleType;
+          const commitmentMatch = state.commitment === "all" || item.commitment === state.commitment;
+          const requirementsMatch = state.requirements === "all" || item.requirements.includes(state.requirements);
+
+          return categoryMatch && audienceMatch && scheduleMatch && roleTypeMatch && commitmentMatch && requirementsMatch;
+        });
+      }
+
+      function formatList(items) {
+        if (items.length <= 1) return items[0] || "";
+        if (items.length === 2) return `${items[0]} and ${items[1]}`;
+        return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+      }
+
+      function schedulePhrase(schedule) {
+        const phrases = {
+          Sunday: "Sunday mornings",
+          Wednesday: "Wednesday evenings",
+          Weekday: "weekdays",
+          Flexible: "on a flexible schedule",
+          Seasonal: "during seasonal events"
+        };
+        return phrases[schedule] || schedule.toLowerCase();
+      }
+
+      function roleEnjoyText(roleType) {
+        const map = {
+          Leadership: "guiding people and helping them grow",
+          Teaching: "teaching, explaining, and encouraging others",
+          Care: "listening, praying, and caring for people",
+          "Front-Facing": "meeting people and helping them feel at ease",
+          "Practical Help": "hands-on help and keeping things running smoothly",
+          "Behind the Scenes": "supporting ministry quietly and reliably",
+          Creative: "music, media, design, or production support"
+        };
+        return map[roleType] || "serving people in a meaningful way";
+      }
+
+      function overviewText(item) {
+        return `This role is best suited for ${formatList(item.audiences).toLowerCase()} and usually serves ${schedulePhrase(item.schedule)}. It is a ${item.commitment.toLowerCase()} opportunity centered on ${item.roleType.toLowerCase()} service.`;
+      }
+
+      function nextStepText(item) {
+        return `If this sounds like a fit, start by expressing interest and a ministry leader can help you understand timing, training, and any next steps for ${item.title.toLowerCase()}.`;
+      }
+
+      function fitBullets(item) {
+        const bullets = [
+          `A good fit for people who enjoy ${roleEnjoyText(item.roleType)}.`,
+          `Most likely to work well for ${formatList(item.audiences).toLowerCase()}.`,
+          item.commitment === "Flexible"
+            ? "Works well if you need some flexibility in how often you serve."
+            : item.commitment === "Seasonal"
+              ? "Usually tied to seasonal moments or special events rather than a weekly rhythm."
+              : "Best for someone ready to serve on a regular, ongoing rhythm."
+        ];
+
+        return bullets;
+      }
+
+      function requirementBullets(item) {
+        return item.requirements.map((requirement) => {
+          const map = {
+            Orientation: "You would start with a simple orientation before serving.",
+            "Training Provided": "Training is provided before you begin.",
+            "Background Check": "A background check is required before serving.",
+            CSA: "A confidential safety application is required before serving.",
+            Audition: "This role includes an audition step.",
+            "Driver Approval": "Driver approval is needed before you begin serving.",
+            "Leader onboarding": "You would walk through leader onboarding before starting.",
+            "Leader approval": "A ministry leader would confirm fit and next steps with you.",
+            "Portfolio Review": "A portfolio or work sample review may be part of the process.",
+            "Skill Review": "A quick skill review may happen before you begin."
+          };
+          return map[requirement] || `${requirement} is part of the next-step process.`;
+        });
+      }
+
+      function renderDetail(item) {
+        document.getElementById("detail-title").textContent = item.title;
+        document.getElementById("detail-category").textContent = item.category;
+        document.getElementById("detail-summary").textContent = item.summary;
+        document.getElementById("detail-best-for").textContent = formatList(item.audiences);
+        document.getElementById("detail-when").textContent = schedulePhrase(item.schedule);
+        document.getElementById("detail-enjoy").textContent = roleEnjoyText(item.roleType);
+        document.getElementById("detail-overview").textContent = overviewText(item);
+        document.getElementById("detail-next-step").textContent = nextStepText(item);
+
+        const fitListEl = document.getElementById("detail-fit-list");
+        fitListEl.innerHTML = "";
+        fitBullets(item).forEach((bullet) => {
+          const li = document.createElement("li");
+          li.textContent = bullet;
+          fitListEl.appendChild(li);
+        });
+
+        const requirementsEl = document.getElementById("detail-requirements");
+        requirementsEl.innerHTML = "";
+        requirementBullets(item).forEach((requirement) => {
+          const li = document.createElement("li");
+          li.textContent = requirement;
+          requirementsEl.appendChild(li);
+        });
+
+      }
+
+      function renderRows(items) {
+        resultsBodyEl.innerHTML = "";
+
+        items.forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "opportunity-card";
+          if (item.title === state.selectedTitle) {
+            row.classList.add("selected");
+          }
+
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "result-button";
+          button.innerHTML = `
+            <strong>${item.title}</strong>
+            <p class="muted card-summary">${item.summary}</p>
+            <div class="card-meta">
+              <span class="card-pill"><span class="card-pill-label">Best for</span><span class="card-pill-value">${formatList(item.audiences)}</span></span>
+              <span class="card-pill"><span class="card-pill-label">Usually</span><span class="card-pill-value">${schedulePhrase(item.schedule)}</span></span>
+            </div>
+            <div class="card-action">Learn more</div>
+          `;
+          button.addEventListener("click", () => {
+            state.selectedTitle = item.title;
+            render();
+          });
+          row.appendChild(button);
+
+          resultsBodyEl.appendChild(row);
+        });
+      }
+
+      function render() {
+        [...categoryNavEl.children].forEach((button) => {
+          button.classList.toggle("active", button.textContent === state.category);
+        });
+
+        const items = filteredOpportunities();
+        const selected = items.find((item) => item.title === state.selectedTitle) || items[0] || opportunities[0];
+        state.selectedTitle = selected.title;
+
+        resultsTitleEl.textContent = state.category === "All Categories" ? "Explore opportunities" : state.category;
+        resultsSubtitleEl.textContent =
+          state.category === "All Categories"
+            ? "Choose a role that sounds interesting to see more details."
+            : `Browse roles in ${state.category} and choose one to see more details.`;
+        resultsCountEl.textContent = `${items.length} roles`;
+        renderRows(items);
+        renderDetail(selected);
+      }
+
+      render();
+    </script>
+  </body>
+</html>
